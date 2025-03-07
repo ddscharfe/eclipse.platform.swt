@@ -31,11 +31,11 @@ public class SkijaGC extends GCHandle {
 		return new SkijaGC(gc, gc.drawable, false);
 	}
 
-	public static SkijaGC createDefaultInstance(NativeGC gc, Control control) {
+	public static SkijaGC createDefaultInstance(NativeGC gc, Drawable control) {
 		return new SkijaGC(gc, control, false);
 	}
 
-	public static SkijaGC createMeasureInstance(NativeGC gc, Control control) {
+	public static SkijaGC createMeasureInstance(NativeGC gc, Drawable control) {
 		return new SkijaGC(gc, control, true);
 	}
 
@@ -49,7 +49,18 @@ public class SkijaGC extends GCHandle {
 
 	private final Point originalDrawingSize;
 
+	private int alpha;
+
+	private LineAttributes lineAttributes;
+
 	private static Map<ColorType, int[]> colorTypeMap = null;
+
+	public SkijaGC(NativeGC gc, Surface surface) {
+		this.innerGC = gc;
+		this.surface = surface;
+		this.originalDrawingSize = new Point(surface.getWidth(), surface.getHeight());
+		initFont();
+	}
 
 	private SkijaGC(NativeGC gc, Drawable drawable, boolean onlyForMeasuring) {
 		innerGC = gc;
@@ -161,6 +172,7 @@ public class SkijaGC extends GCHandle {
 			paint.setColor(convertSWTColorToSkijaColor(getBackground()));
 			paint.setMode(PaintMode.FILL);
 			paint.setAntiAlias(true);
+			paint.setAlpha(alpha);
 			operations.accept(paint);
 		});
 	}
@@ -829,7 +841,11 @@ public class SkijaGC extends GCHandle {
 
 	@Override
 	public void setClipping(int x, int y, int width, int height) {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+		innerGC.setClipping(x, y, width, height);
+//		surface.getCanvas().clipRect(new Rect(x, y, width, height));
+//		Paint paint = new Paint();
+//		surface.getCanvas().drawRect(new Rect(10, 10, 500, 500), paint);
+//		paint.close();
 	}
 
 	@Override
@@ -839,13 +855,12 @@ public class SkijaGC extends GCHandle {
 
 	@Override
 	public void setAlpha(int alpha) {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+		this.alpha = alpha;
 	}
 
 	@Override
 	public int getAlpha() {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
-		return 0;
+		return alpha;
 	}
 
 	@Override
@@ -1041,8 +1056,7 @@ public class SkijaGC extends GCHandle {
 
 	@Override
 	protected boolean getAdvanced() {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
-		return false;
+		return true;
 	}
 
 	@Override
@@ -1106,7 +1120,6 @@ public class SkijaGC extends GCHandle {
 
 	@Override
 	protected boolean getXORMode() {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
 		return false;
 	}
 
@@ -1117,18 +1130,20 @@ public class SkijaGC extends GCHandle {
 
 	@Override
 	protected void setClipping(Path path) {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+//		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+		innerGC.setClipping(path);
 
 	}
 
 	@Override
 	protected void setClipping(Rectangle rect) {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+		innerGC.setClipping(rect.x, rect.y, rect.width, rect.height);
 	}
 
 	@Override
 	protected void setClipping(Region region) {
 		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+		innerGC.setClipping(region);
 	}
 
 	@Override
@@ -1148,7 +1163,7 @@ public class SkijaGC extends GCHandle {
 
 	@Override
 	protected void setLineAttributes(LineAttributes attributes) {
-		System.err.println("WARN: Not implemented yet: " + new Throwable().getStackTrace()[0]);
+		this.lineAttributes = attributes;
 	}
 
 	@Override

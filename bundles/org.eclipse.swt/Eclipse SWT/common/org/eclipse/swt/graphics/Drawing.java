@@ -20,11 +20,11 @@ public final class Drawing {
 	private Drawing() {
 	}
 
-	public static GC createGraphicsContext(GC originalGC, Control control) {
+	public static GC createGraphicsContext(GC originalGC, Drawable control) {
 		return createGraphicsContext(originalGC, control, false);
 	}
 
-	private static GC createGraphicsContext(GC originalGC, Control control, boolean onlyForMeasuring) {
+	private static GC createGraphicsContext(GC originalGC, Drawable control, boolean onlyForMeasuring) {
 		if (!SWT.USE_SKIJA) {
 			return originalGC;
 		}
